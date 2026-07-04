@@ -1,22 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, MapPin, Compass, BookOpen, Sparkles, Calendar, Radio } from 'lucide-react';
+import { Mic, MicOff, Volume2, MapPin, Compass, BookOpen, Sparkles, Calendar, Radio, Send } from 'lucide-react';
 
 const HeritageAI = () => {
   const [isListening, setIsListening] = useState(false);
+  const [textQuery, setTextQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [chatHistory, setChatHistory] = useState([
     {
       id: 1,
       sender: 'bot',
-      text: "Khamma Ghani! Welcome to Indore's digital cultural corridor. Tap the microphone and ask me about hidden tales of Rajwada, the midnight culinary magic of Sarafa Bazar, or royal Holkar history. What shall we explore today?",
+      text: "Khamma Ghani! Welcome to Indore's digital cultural corridor. Type your question below or tap the microphone to ask me about hidden tales of Rajwada, the midnight culinary magic of Sarafa Bazar, or royal Holkar history.",
       timestamp: '12:00 PM'
     }
   ]);
   const [aiStatus, setAiStatus] = useState('Idle');
   const [audioVisualizerBars, setAudioVisualizerBars] = useState(Array(15).fill(4));
-  const visualizerRef = useRef(null);
+  const chatEndRef = useRef(null);
 
-  // Simulate audio visualizer dancing when listening
+  // Auto-scroll to the bottom of the chat logs
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
+
+  // Simulate audio visualizer dancing when voice is active
   useEffect(() => {
     let interval;
     if (isListening) {
@@ -30,25 +36,58 @@ const HeritageAI = () => {
     return () => clearInterval(interval);
   }, [isListening]);
 
+  // Simulated dynamic system response framework
+  const simulateBackendResponse = (userPrompt) => {
+    setAiStatus('Processing query with RAG Engine...');
+    
+    setTimeout(() => {
+      let botText = "That sounds fascinating! My RAG repositories are pulling deep Malwa historical records to compile an immersive story regarding that specific local experience right now.";
+      
+      if (userPrompt.toLowerCase().includes('rajwada')) {
+        botText = "Ah, Rajwada! Did you know its lower three floors are crafted purely out of stone, while the upper four floors are built entirely of teakwood? This layout was structurally chosen by Maratha architects to absorb seismic micro-shocks across the Kahn river basin.";
+      } else if (userPrompt.toLowerCase().includes('sarafa') || userPrompt.toLowerCase().includes('food')) {
+        botText = "The magic of Sarafa Bazar lies in its dual existence. By day, it's a quiet bullion trading hub. By 9 PM, it transforms completely into a street food legacy. Don't skip the double-fried Garadu topped with secret Jeeravan spice blends!";
+      }
+
+      setChatHistory(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          sender: 'bot',
+          text: botText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+      setAiStatus('Speaking response...');
+    }, 1200);
+  };
+
+  const handleTextSubmit = (e) => {
+    e.preventDefault();
+    if (!textQuery.trim()) return;
+
+    const currentTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const userMessage = textQuery;
+
+    setChatHistory(prev => [...prev, { id: Date.now(), sender: 'user', text: userMessage, timestamp: currentTimestamp }]);
+    setTextQuery('');
+    simulateBackendResponse(userMessage);
+  };
+
   const toggleListening = () => {
     if (isListening) {
       setIsListening(false);
-      setAiStatus('Processing your query with RAG Engine...');
+      setAiStatus('Processing spoken query...');
       
-      // Simulate backend response after a short delay
+      // Simulating a parsed transcription
       setTimeout(() => {
+        const spokenDummy = "Tell me something unique about Rajwada architecture.";
         setChatHistory(prev => [
           ...prev,
-          { id: Date.now(), sender: 'user', text: "Tell me a hidden story about Lal Bagh Palace.", timestamp: '12:04 PM' },
-          { 
-            id: Date.now() + 1, 
-            sender: 'bot', 
-            text: "Ah, the magnificent Lal Bagh Palace! Beyond its grand gates—which are exact replicas of those at Buckingham Palace—lies a lesser-known tale. It was among the first in India to feature a completely mechanized underground kitchen line connected via a miniature railway system directly to the banquet halls to ensure the Holkar rulers' food was served perfectly hot. Let me stream the full oral history narrative for you.",
-            timestamp: '12:04 PM'
-          }
+          { id: Date.now(), sender: 'user', text: spokenDummy, timestamp: 'Voice Entry' }
         ]);
-        setAiStatus('Speaking...');
-      }, 1500);
+        simulateBackendResponse(spokenDummy);
+      }, 1000);
     } else {
       setIsListening(true);
     }
@@ -96,7 +135,7 @@ const HeritageAI = () => {
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-200 bg-clip-text text-transparent">
               HeritageAI
             </h1>
-            <p className="text-xs text-slate-400 font-medium">GenAI-Powered Voice Guide • Indore Cultural Corridor</p>
+            <p className="text-xs text-slate-400 font-medium">GenAI-Powered Voice & Text Guide • Indore</p>
           </div>
         </div>
         <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full text-xs text-slate-300">
@@ -108,11 +147,11 @@ const HeritageAI = () => {
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Side - The Conversational Voice Interface */}
-        <section className="lg:col-span-7 flex flex-col bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md shadow-xl justify-between min-h-[600px]">
+        {/* Left Side - The Conversational Hybrid Hub */}
+        <section className="lg:col-span-7 flex flex-col bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md shadow-xl justify-between min-h-[620px]">
           
           {/* Chat Logs Window */}
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 overflow-x-hidden custom-scrollbar mb-4">
             {chatHistory.map((msg) => (
               <div 
                 key={msg.id} 
@@ -128,48 +167,71 @@ const HeritageAI = () => {
                 <span className="text-[10px] text-slate-500 mt-1 px-1">{msg.timestamp}</span>
               </div>
             ))}
+            <div ref={chatEndRef} />
           </div>
 
-          {/* Voice Activation Hub */}
-          <div className="mt-6 pt-6 border-t border-slate-800/80 flex flex-col items-center">
+          {/* Prompting Interface & Action Panel */}
+          <div className="pt-4 border-t border-slate-800/80 space-y-4">
             
-            {/* Live Audio Waves Simulation */}
-            <div className="flex items-end justify-center gap-1 h-12 mb-4">
-              {audioVisualizerBars.map((height, i) => (
-                <div 
-                  key={i} 
-                  style={{ height: `${height}px` }}
-                  className={`w-1 rounded-full transition-all duration-100 ${
-                    isListening ? 'bg-gradient-to-t from-orange-500 to-amber-400' : 'bg-slate-700'
-                  }`}
-                />
-              ))}
+            {/* Live Audio Waves Monitoring Row */}
+            <div className="flex items-center justify-between px-2 bg-slate-950/40 py-2 rounded-xl border border-slate-900">
+              <span className="text-[11px] font-mono text-amber-400/90 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
+                Status: {aiStatus}
+              </span>
+              <div className="flex items-end gap-0.5 h-6">
+                {audioVisualizerBars.map((height, i) => (
+                  <div 
+                    key={i} 
+                    style={{ height: `${height * 0.5}px` }} 
+                    className={`w-0.5 rounded-full transition-all duration-100 ${
+                      isListening ? 'bg-gradient-to-t from-orange-500 to-amber-400' : 'bg-slate-800'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
 
-            <p className="text-xs font-mono text-amber-400/80 mb-6 bg-amber-500/5 px-3 py-1 rounded-full border border-amber-500/10">
-              System Status: {aiStatus}
-            </p>
+            {/* Hybrid Input Box (Text + Voice Button Side-by-Side) */}
+            <form onSubmit={handleTextSubmit} className="flex items-center gap-3">
+              <button 
+                type="button"
+                onClick={toggleListening}
+                className={`p-3.5 rounded-xl transition-all duration-200 flex-shrink-0 relative group shadow-md ${
+                  isListening 
+                    ? 'bg-red-500 text-white ring-4 ring-red-500/10' 
+                    : 'bg-slate-800 text-amber-400 border border-slate-700 hover:bg-slate-750 hover:text-amber-300'
+                }`}
+                title={isListening ? "Stop recording" : "Ask via voice"}
+              >
+                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isListening && (
+                  <span className="absolute -inset-0.5 rounded-xl bg-red-500 opacity-20 blur animate-ping" />
+                )}
+              </button>
 
-            {/* Mic Primary Switch Trigger */}
-            <button 
-              onClick={toggleListening}
-              className={`relative p-6 rounded-full transition-all duration-300 transform active:scale-95 shadow-xl group ${
-                isListening 
-                  ? 'bg-red-500 text-white shadow-red-500/20 ring-4 ring-red-500/20' 
-                  : 'bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 shadow-orange-500/20 hover:brightness-110'
-              }`}
-            >
-              {isListening ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-              <span className="absolute -inset-1 rounded-full bg-inherit opacity-25 blur animate-ping group-hover:opacity-40 transition" />
-            </button>
-            <span className="text-xs text-slate-400 mt-3 font-medium">
-              {isListening ? "Tap to interrupt or finish" : "Tap to speak with HeritageAI"}
-            </span>
+              <div className="relative flex-1">
+                <input 
+                  type="text"
+                  value={textQuery}
+                  onChange={(e) => setTextQuery(e.target.value)}
+                  placeholder="Ask HeritageAI (e.g., 'Tell me about Sarafa Bazar architecture'...)"
+                  disabled={isListening}
+                  className="w-full bg-slate-950/80 border border-slate-800 focus:border-amber-500/50 rounded-xl py-3 pl-4 pr-12 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!textQuery.trim() || isListening}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-amber-400 disabled:opacity-30 disabled:hover:text-slate-400 transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
           </div>
 
         </section>
 
-        {/* Right Side - Discovery Hub backed by Vector DB Concepts */}
+        {/* Right Side - Discovery Hub */}
         <section className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md">
             <h2 className="text-lg font-semibold mb-2 flex items-center gap-2 text-slate-200">
